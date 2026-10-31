@@ -1,0 +1,14 @@
+# ShulkerInShulker Configuration
+
+# Maximum nesting depth allowed (0 = unlimited)
+# Example: depth of 2 means shulker -> shulker -> shulker (3 levels total)
+max-nesting-depth: 0
+
+# Whether to show a message when a player nests shulker boxes
+show-nesting-message: false
+
+# Message shown when player nests a shulker (supports color codes with &)
+nesting-message: "&aShulker box nested!"
+
+# Whether to allow shulker boxes with items inside to be nested
+allow-filled-shulkers: true

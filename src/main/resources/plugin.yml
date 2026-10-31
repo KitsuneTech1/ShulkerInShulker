@@ -1,0 +1,22 @@
+name: ShulkerInShulker
+version: ${project.version}
+main: com.kitsune.shulkerinshulker.ShulkerInShulker
+api-version: '1.21'
+description: Allows players to store shulker boxes inside other shulker boxes
+
+authors:
+  - KitsuneTech
+
+permissions:
+  shulkerinshulker.use:
+    description: Allows the player to put shulker boxes inside other shulker boxes
+    default: true
+  shulkerinshulker.bypass:
+    description: Bypasses any nesting depth limit
+    default: op
+
+commands:
+  shulkerinshulker:
+    description: Main command for ShulkerInShulker plugin
+    aliases: [sis, shulkerbox]
+    permission: shulkerinshulker.use
