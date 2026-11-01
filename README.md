@@ -26,7 +26,7 @@ ShulkerInShulker removes the vanilla restriction that stops you from placing a s
 | Command | Aliases | Description | Permission |
 |---|---|---|---|
 | `/shulkerinshulker` | `/sis`, `/shulkerbox` | Shows plugin status and the current max nesting depth | `shulkerinshulker.use` |
-| `/shulkerinshulker reload` | | Reloads config.yml | `shulkerinshulker.admin` (not declared in plugin.yml, grant separately or via op) |
+| `/shulkerinshulker reload` | | Reloads config.yml | `shulkerinshulker.admin` |
 
 ## Permissions
 
@@ -34,6 +34,7 @@ ShulkerInShulker removes the vanilla restriction that stops you from placing a s
 |---|---|---|
 | `shulkerinshulker.use` | true | Nest shulker boxes inside other shulker boxes, and run the base command |
 | `shulkerinshulker.bypass` | op | Ignore the configured max nesting depth |
+| `shulkerinshulker.admin` | op | Reload the plugin configuration |
 
 ## Config
 

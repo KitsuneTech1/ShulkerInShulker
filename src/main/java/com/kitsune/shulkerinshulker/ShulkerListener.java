@@ -111,5 +111,9 @@ public class ShulkerListener implements Listener {
         if (!canNest(player, draggedItem)) return;
 
         event.setCancelled(false);
+
+        if (plugin.shouldShowNestingMessage()) {
+            player.sendMessage(plugin.getNestingMessage());
+        }
     }
 }

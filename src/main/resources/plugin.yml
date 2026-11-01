@@ -14,6 +14,9 @@ permissions:
   shulkerinshulker.bypass:
     description: Bypasses any nesting depth limit
     default: op
+  shulkerinshulker.admin:
+    description: Reloads the plugin configuration
+    default: op
 
 commands:
   shulkerinshulker:
