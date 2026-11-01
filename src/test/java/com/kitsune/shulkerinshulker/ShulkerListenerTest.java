@@ -2,6 +2,9 @@ package com.kitsune.shulkerinshulker;
 
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,6 +23,8 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ShulkerListenerTest {
@@ -43,7 +48,7 @@ class ShulkerListenerTest {
 
     @Test
     void clickIntoShulkerIsAllowedForColoredShulkers() {
-        Inventory inventory = openShulkerInventory();
+        openShulkerInventory();
         InventoryClickEvent event = new InventoryClickEvent(
                 player.getOpenInventory(),
                 InventoryType.SlotType.CONTAINER,
@@ -56,7 +61,7 @@ class ShulkerListenerTest {
         server.getPluginManager().callEvent(event);
 
         assertFalse(event.isCancelled());
-        assertTrue(inventory.getType() == InventoryType.SHULKER_BOX);
+        assertSame(player.getOpenInventory().getTopInventory(), event.getClickedInventory());
     }
 
     @Test
@@ -74,6 +79,7 @@ class ShulkerListenerTest {
         event.setCancelled(true);
 
         server.getPluginManager().callEvent(event);
+        server.getScheduler().performOneTick();
 
         assertFalse(event.isCancelled());
         assertTrue(player.nextMessage().contains("Nested"));
@@ -107,6 +113,45 @@ class ShulkerListenerTest {
         event.setCancelled(true);
         server.getPluginManager().callEvent(event);
         assertFalse(event.isCancelled());
+    }
+
+    @Test
+    void nonPlacementClickRemainsCancelled() {
+        openShulkerInventory();
+
+        InventoryClickEvent event = new InventoryClickEvent(
+                player.getOpenInventory(),
+                InventoryType.SlotType.CONTAINER,
+                0,
+                ClickType.LEFT,
+                InventoryAction.NOTHING);
+        event.setCursor(new ItemStack(Material.SHULKER_BOX));
+        event.setCancelled(true);
+
+        server.getPluginManager().callEvent(event);
+
+        assertTrue(event.isCancelled());
+    }
+
+    @Test
+    void laterProtectionCancellationIsRespected() {
+        openShulkerInventory();
+        configure("show-nesting-message", true);
+        server.getPluginManager().registerEvents(new Listener() {
+            @EventHandler(priority = EventPriority.HIGH)
+            public void protect(InventoryClickEvent event) {
+                event.setCancelled(true);
+            }
+        }, plugin);
+
+        InventoryClickEvent event = clickWithCursor(new ItemStack(Material.SHULKER_BOX));
+        event.setCancelled(true);
+
+        server.getPluginManager().callEvent(event);
+        server.getScheduler().performOneTick();
+
+        assertTrue(event.isCancelled());
+        assertNull(player.nextMessage());
     }
 
     @Test

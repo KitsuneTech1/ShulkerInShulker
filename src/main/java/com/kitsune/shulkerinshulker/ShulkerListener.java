@@ -3,9 +3,11 @@ package com.kitsune.shulkerinshulker;
 import org.bukkit.Material;
 import org.bukkit.block.ShulkerBox;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
@@ -27,6 +29,23 @@ public class ShulkerListener implements Listener {
 
     private boolean isShulkerBox(ItemStack item) {
         return item != null && isShulkerBox(item.getType());
+    }
+
+    private boolean placesCursorItem(InventoryAction action) {
+        return switch (action) {
+            case PLACE_ALL, PLACE_ONE, PLACE_SOME, SWAP_WITH_CURSOR -> true;
+            default -> false;
+        };
+    }
+
+    private void showNestingMessageAfterEvent(Player player, Cancellable event) {
+        if (!plugin.shouldShowNestingMessage()) return;
+
+        plugin.getServer().getScheduler().runTask(plugin, () -> {
+            if (!event.isCancelled()) {
+                player.sendMessage(plugin.getNestingMessage());
+            }
+        });
     }
 
     private int getNestingDepth(ItemStack item) {
@@ -72,7 +91,7 @@ public class ShulkerListener implements Listener {
         return true;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryClick(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
@@ -83,18 +102,16 @@ public class ShulkerListener implements Listener {
         ItemStack cursorItem = event.getCursor();
         if (cursorItem == null || cursorItem.getType().isAir()) return;
         if (!isShulkerBox(cursorItem)) return;
+        if (!placesCursorItem(event.getAction())) return;
 
         // Leave vanilla's own restriction (which cancels this) in place if nesting isn't allowed.
         if (!canNest(player, cursorItem)) return;
 
         event.setCancelled(false);
-
-        if (plugin.shouldShowNestingMessage()) {
-            player.sendMessage(plugin.getNestingMessage());
-        }
+        showNestingMessageAfterEvent(player, event);
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onInventoryDrag(InventoryDragEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
 
@@ -111,9 +128,6 @@ public class ShulkerListener implements Listener {
         if (!canNest(player, draggedItem)) return;
 
         event.setCancelled(false);
-
-        if (plugin.shouldShowNestingMessage()) {
-            player.sendMessage(plugin.getNestingMessage());
-        }
+        showNestingMessageAfterEvent(player, event);
     }
 }
