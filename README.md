@@ -4,6 +4,7 @@
 
 Paper plugin that lets you nest shulker boxes inside other shulker boxes.
 
+[![Build Status](https://github.com/KitsuneTech1/ShulkerInShulker/actions/workflows/ci.yml/badge.svg)](https://github.com/KitsuneTech1/ShulkerInShulker/actions)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Minecraft](https://img.shields.io/badge/Minecraft-1.21-brightgreen.svg)
 ![Paper](https://img.shields.io/badge/Paper-API-orange.svg)
@@ -26,6 +27,22 @@ The plugin generates `config.yml` on first load. Key options:
 - `allow-filled-shulkers` - whether filled shulker boxes can be nested (default: true)
 - `show-nesting-message` - whether to chat a message when a player nests a shulker box
 - `nesting-message` - the message text; supports `&` color codes
+
+
+## Architecture & Mechanics
+
+```mermaid
+flowchart TD
+    A[Player Clicks/Drags Shulker in Inventory] --> B{Destination is Shulker GUI?}
+    B -- No --> C[Default Vanilla Behavior]
+    B -- Yes --> D{Player has bypass perm?}
+    D -- Yes --> E[Allow Nesting]
+    D -- No --> F{Check Nesting Depth}
+    F -- Depth Exceeded --> G[Cancel Event & Send Warning]
+    F -- Within Limit --> H{Allow Filled Shulkers?}
+    H -- Empty Only & Item Has Contents --> G
+    H -- Allowed --> E
+```
 
 ## Commands
 
